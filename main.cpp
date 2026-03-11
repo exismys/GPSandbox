@@ -1,5 +1,6 @@
 #include "raylib.h"
 #include "visualization.cpp"
+#include "coordinate.cpp"
 #include <vector>
 
 struct Circle {
@@ -17,15 +18,16 @@ void updatePhysics(std::vector<Circle> &circles, float dt) {
 
 int main(void) {
   // Window configuration
-  const int screenWidth = 800;
-  const int screenHeight = 600;
+  const int screenWidth = 1200;
+  const int screenHeight = 800;
 
   InitWindow(screenWidth, screenHeight, "Canvas of Emergence - v0");
   SetTargetFPS(60);
 
   std::vector<Circle> circles;
-  circles.push_back({{200, 200}, {5, 5}, 10});
+  circles.push_back({{200, 200}, {100, 100}, 10});
   Arrow arrow = {{100, 100}, {300, 300}};
+  Cartesian coords(screenWidth, screenHeight);
 
   // Game loop
   while (!WindowShouldClose()) {
@@ -37,6 +39,7 @@ int main(void) {
       DrawCircleV(c.position, c.radius, RED);
     }
     arrow.drawArrow();
+    coords.drawAxis();
     EndDrawing();
   }
 
