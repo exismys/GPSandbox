@@ -1,15 +1,16 @@
 #include "raylib.h"
 #include "raymath.h"
+#include "coordinate.cpp"
 
 struct Arrow {
   Vector2 pos1;
   Vector2 pos2;
 
-  void drawArrow() {
-    DrawLineV(pos1, pos2, LIGHTGRAY);
+  void drawArrow(Cartesian coords) {
+    DrawLineV(coords.toScreen(pos1), coords.toScreen(pos2), LIGHTGRAY);
 
-    Vector2 tip = pos2;
-    Vector2 direction = Vector2Normalize(Vector2Subtract(pos2, pos1));
+    Vector2 tip = coords.toScreen(pos2);
+    Vector2 direction = Vector2Normalize(Vector2Subtract(coords.toScreen(pos2), coords.toScreen(pos1)));
     Vector2 perpendicular = {-direction.y, direction.x};
 
     float arrowHeadLength = 20.0f;

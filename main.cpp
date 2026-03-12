@@ -3,16 +3,17 @@
 #include "coordinate.cpp"
 #include <vector>
 
-struct Circle {
+struct Particle {
   Vector2 position;
   Vector2 velocity;
   float radius;
+  float mass;
 };
 
-void updatePhysics(std::vector<Circle> &circles, float dt) {
-  for (Circle& c : circles) {
-    c.position.x += c.velocity.x * dt;
-    c.position.y += c.velocity.y * dt;
+void updatePhysics(std::vector<Particle> &particles, float dt) {
+  for (Particle& p : particles) {
+    p.position.x += p.velocity.x * dt;
+    p.position.y += p.velocity.y * dt;
   }
 }
 
@@ -24,21 +25,23 @@ int main(void) {
   InitWindow(screenWidth, screenHeight, "Canvas of Emergence - v0");
   SetTargetFPS(60);
 
-  std::vector<Circle> circles;
-  circles.push_back({{200, 200}, {100, 100}, 10});
-  Arrow arrow = {{100, 100}, {300, 300}};
+  std::vector<Particle> particles;
+  particles.push_back({{2, 2}, {2, 2}, 10, 1});
+  
+  Arrow arrow = {{1, 1}, {3, 3}};
+
   Cartesian coords(screenWidth, screenHeight);
 
   // Game loop
   while (!WindowShouldClose()) {
     float dt = GetFrameTime();
-    updatePhysics(circles, dt);
+    updatePhysics(particles, dt);
     BeginDrawing();
     ClearBackground(BLACK);
-    for (Circle& c: circles) {
-      DrawCircleV(c.position, c.radius, RED);
+    for (Particle& p: particles) {
+      DrawCircleV(coords.toScreen(p.position), p.radius, RED);
     }
-    arrow.drawArrow();
+    arrow.drawArrow(coords);
     coords.drawAxis();
     EndDrawing();
   }
