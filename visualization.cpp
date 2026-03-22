@@ -1,6 +1,6 @@
 #include "raylib.h"
 #include "raymath.h"
-#include "coordinate.cpp"
+#include "coordinate.h"
 
 struct Arrow {
   Vector2 pos1;

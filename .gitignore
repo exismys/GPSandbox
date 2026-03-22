@@ -1,5 +1,6 @@
 sim
 raylib_test/sim
+opengl/sim
 *.out
 *.exe
 *.app

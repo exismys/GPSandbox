@@ -1,6 +1,6 @@
 #include "raylib.h"
-#include "visualization.cpp"
-#include "coordinate.cpp"
+#include "visualization.h"
+#include "coordinate.h"
 #include <vector>
 
 struct Particle {
