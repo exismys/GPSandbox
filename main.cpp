@@ -1,5 +1,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <math.h>
 #include <iostream>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
@@ -96,9 +97,10 @@ int main() {
 
     const char *fragmentShaderSource = "#version 330 core\n"
         "out vec4 FragColor;\n"
+        "uniform vec4 ourColor;\n"
         "void main()\n"
         "{\n"
-        "FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+        "FragColor = ourColor;\n"
         "}\0";
 
     unsigned int fragmentShader;
@@ -125,6 +127,9 @@ int main() {
         std::cout << "ERROR::SHADER:LINKING_FAILED\n" << infoLog << std::endl;
     }
 
+    // Get the uniform location
+    int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+
     glUseProgram(shaderProgram);
 
     glDeleteShader(vertexShader);
@@ -143,6 +148,9 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         glUseProgram(shaderProgram);
+        float timeValue = glfwGetTime();
+        float greenValue = sin(timeValue) / 2.0f + 0.5f;
+        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
         glBindVertexArray(VAO);
         
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
