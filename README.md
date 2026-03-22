@@ -1,10 +1,3 @@
-## Dependencies
+## Setup glfw
 
-### cmake
-
-- `sudo apt install cmake`
-
-## Run
-
-- `g++ main.cpp -o sim -lraylib -lGL -lm -lpthread -ldl -lrt -lX11`
-
+sudo apt install libglfw3-dev libgl1-mesa-dev

@@ -1,4 +1,4 @@
 #!/bin/bash
 
-g++ main.cpp coordinate.cpp -o sim -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
+g++ main.cpp glad.c -Iinclude -lglfw -lGL -ldl -o sim
 ./sim

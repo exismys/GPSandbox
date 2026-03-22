@@ -1,52 +1,58 @@
-#include "raylib.h"
-#include "visualization.h"
-#include "coordinate.h"
-#include <vector>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <iostream>
 
-struct Particle {
-  Vector2 position;
-  Vector2 velocity;
-  float radius;
-  float mass;
-};
-
-void updatePhysics(std::vector<Particle> &particles, float dt) {
-  for (Particle& p : particles) {
-    p.position.x += p.velocity.x * dt;
-    p.position.y += p.velocity.y * dt;
-  }
+void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+    glViewport(0, 0, width, height);
 }
 
-int main(void) {
-  // Window configuration
-  const int screenWidth = 1200;
-  const int screenHeight = 800;
+void processInput(GLFWwindow *window){
+    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+}
 
-  InitWindow(screenWidth, screenHeight, "Canvas of Emergence - v0");
-  SetTargetFPS(60);
-
-  std::vector<Particle> particles;
-  particles.push_back({{2, 2}, {2, 2}, 10, 1});
-  
-  Arrow arrow = {{1, 1}, {3, 3}};
-
-  Cartesian coords(screenWidth, screenHeight);
-
-  // Game loop
-  while (!WindowShouldClose()) {
-    float dt = GetFrameTime();
-    updatePhysics(particles, dt);
-    BeginDrawing();
-    ClearBackground(BLACK);
-    for (Particle& p: particles) {
-      DrawCircleV(coords.toScreen(p.position), p.radius, RED);
+int main() {
+    if (!glfwInit())
+    {
+        std::cout << "Failed to initialize GLFW\n";
+        return -1;
     }
-    arrow.drawArrow(coords);
-    coords.drawAxis();
-    EndDrawing();
-  }
 
-  CloseWindow();
-  return 0;
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    GLFWwindow* window = glfwCreateWindow(800, 600, "My First OpenGL Window", NULL, NULL);
+
+    if (!window)
+    {
+        std::cout << "Failed to create window\n";
+        glfwTerminate();
+        return -1;
+    }
+
+    glfwMakeContextCurrent(window);
+
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    {
+        std::cout << "Failed to initialize GLAD\n";
+        return -1;
+    }
+
+    glViewport(0, 0, 800, 600);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+    while (!glfwWindowShouldClose(window))
+    {
+        processInput(window);
+
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+
+    glfwTerminate();
+    return 0;
 }
-
