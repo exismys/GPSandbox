@@ -7,7 +7,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-void processInput(GLFWwindow *window){
+void processInput(GLFWwindow *window) {
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 }
@@ -58,14 +58,14 @@ int main() {
     // };
 
     unsigned int indices[] = {
-        0, 1, 5,
-        2, 3, 4
+        0, 1, 2,
+        3, 4, 5
     };  
 
     unsigned int VBO, VAO, EBO;
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
 
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
@@ -148,12 +148,43 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         glUseProgram(shaderProgram);
-        float timeValue = glfwGetTime();
-        float greenValue = sin(timeValue) / 2.0f + 0.5f;
-        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
         glBindVertexArray(VAO);
+
+        float timeValue = glfwGetTime();
+        // std::cout << "Time: " << timeValue << std::endl;
+
+        float duration = 2.0f;
+        float t = fmod(timeValue, duration) / duration;
+
+        if (true) {
+
+            float sourceVertices[] = {
+                -0.55f,  0.5f, 0.0f,
+                0.55f, 0.5f, 0.0f
+            };
+
+            float targetVertices[] = {
+                0.55f, 0.5f, 0.0f,
+                -0.55f,  0.5f, 0.0f
+            };
+
+            float currentVertices[6];
+            for (int i = 0; i < 6; i++) {
+                currentVertices[i] = sourceVertices[i] + t * (targetVertices[i] - sourceVertices[i]);
+            }
+
+            // To update the first vertex (Index 2 in the original array):
+            glBufferSubData(GL_ARRAY_BUFFER, 6 * sizeof(float), 3 * sizeof(float), &currentVertices[0]);
+
+            // To update the second vertex (Index 5 in the original array):
+            glBufferSubData(GL_ARRAY_BUFFER, 15 * sizeof(float), 3 * sizeof(float), &currentVertices[3]);
+
+            glUniform4f(vertexColorLocation, 0.0f, 1 - t, 0.0f, 1.0f);
+        }
         
+       
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
         // glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
 
