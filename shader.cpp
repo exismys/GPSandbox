@@ -2,7 +2,7 @@
 #include <glad/glad.h>
 #include <fstream>
 #include <sstream>
-#include <iostream>
+#include <iostream>;
 
 Shader::Shader(const char* vertexPath, const char* fragmentPath) {
     std::string vertexCode;
@@ -22,8 +22,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath) {
         fShaderFile.close();
         vertexCode = vShaderStream.str();
         fragmentCode = fShaderStream.str();		
-    }
-    catch (std::ifstream::failure& e) {
+    } catch (std::ifstream::failure& e) {
         std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ\n";
     }
     const char* vShaderCode = vertexCode.c_str();

@@ -1,8 +1,9 @@
 #include <glad/glad.h>
+#include <stb_image/stb_image.h>
 #include <GLFW/glfw3.h>
 #include <math.h>
-#include "shader.h"
 #include <iostream>
+#include "shader.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -23,7 +24,6 @@ int main() {
         glfwTerminate();
         return -1;
     }
-
     glfwMakeContextCurrent(window);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -43,12 +43,11 @@ int main() {
         0.9f, -0.5f, 0.0f,
         0.55f, 0.5f, 0.0f
     };
-
     // The orders of the vertices to draw the triangles
     unsigned int indices[] = {
         0, 1, 2,
         3, 4, 5
-    };  
+    };
 
     unsigned int VBO, VAO, EBO;
     glGenBuffers(1, &VBO);
@@ -71,6 +70,25 @@ int main() {
     
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+    float texCoords[] = {
+        0.0f, 0.0f,  // lower-left corner  
+        1.0f, 0.0f,  // lower-right corner
+        0.5f, 1.0f   // top-center corner
+    };
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    int width, height, nrChannels;
+    unsigned char *data = stbi_load("container.jpg", &width, &height, &nrChannels, 0);
+
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
     while (!glfwWindowShouldClose(window)) {
         processInput(window);
 
@@ -85,13 +103,11 @@ int main() {
         // std::cout << "Time: " << timeValue << std::endl;
         float duration = 2.0f;
         float t = fmod(timeValue, duration) / duration;
-
         if (timeValue < duration) {
             float sourceVertices[] = {
                 -0.55f,  0.5f, 0.0f,
                 0.55f, 0.5f, 0.0f
             };
-
             float targetVertices[] = {
                 0.55f, 0.5f, 0.0f,
                 -0.55f,  0.5f, 0.0f
