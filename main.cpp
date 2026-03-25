@@ -35,18 +35,26 @@ int main() {
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     // Triangle vertex
-    float vertices[] = {
-        -0.9f, -0.5f, 0.0f,
-        -0.4f, -0.5f, 0.0f,
-        -0.55f,  0.5f, 0.0f,
-        0.4f, -0.5f, 0.0f,
-        0.9f, -0.5f, 0.0f,
-        0.55f, 0.5f, 0.0f
-    };
+    // float vertices[] = {
+    //     -0.9f, -0.5f, 0.0f,
+    //     -0.4f, -0.5f, 0.0f,
+    //     -0.55f,  0.5f, 0.0f,
+    //     0.4f, -0.5f, 0.0f,
+    //     0.9f, -0.5f, 0.0f,
+    //     0.55f, 0.5f, 0.0f
+    // };
     // The orders of the vertices to draw the triangles
     unsigned int indices[] = {
         0, 1, 2,
-        3, 4, 5
+        2, 3, 0
+    };
+
+    float vertices[] = {
+        // positions          // colors           // texture coords
+        0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+        0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
     };
 
     unsigned int VBO, VAO, EBO;
@@ -65,8 +73,12 @@ int main() {
 
     // This configures how OpenGL should interpret the vertex data (per vertex attribute)
     // This is storing the vertex attribute configuration in the currently bound VAO, so that we can simply bind the VAO to draw the triangle later
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
     
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -75,19 +87,24 @@ int main() {
         1.0f, 0.0f,  // lower-right corner
         0.5f, 1.0f   // top-center corner
     };
+
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     int width, height, nrChannels;
-    unsigned char *data = stbi_load("container.jpg", &width, &height, &nrChannels, 0);
-
-    unsigned int texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
+    unsigned char *data = stbi_load("textures/container.jpg", &width, &height, &nrChannels, 0);
+    if (data) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    } else {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
 
     while (!glfwWindowShouldClose(window)) {
         processInput(window);
@@ -96,36 +113,38 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         ourShader.use();
-        int vertexColorLocation = glGetUniformLocation(ourShader.ID, "ourColor");
+        // int vertexColorLocation = glGetUniformLocation(ourShader.ID, "ourColor");
         glBindVertexArray(VAO);
 
-        float timeValue = glfwGetTime();
-        // std::cout << "Time: " << timeValue << std::endl;
-        float duration = 2.0f;
-        float t = fmod(timeValue, duration) / duration;
-        if (timeValue < duration) {
-            float sourceVertices[] = {
-                -0.55f,  0.5f, 0.0f,
-                0.55f, 0.5f, 0.0f
-            };
-            float targetVertices[] = {
-                0.55f, 0.5f, 0.0f,
-                -0.55f,  0.5f, 0.0f
-            };
+        // FragColor = texture(ourTexture, TexCoord);
 
-            float currentVertices[6];
-            for (int i = 0; i < 6; i++) {
-                currentVertices[i] = sourceVertices[i] + t * (targetVertices[i] - sourceVertices[i]);
-            }
+        // float timeValue = glfwGetTime();
+        // // std::cout << "Time: " << timeValue << std::endl;
+        // float duration = 2.0f;
+        // float t = fmod(timeValue, duration) / duration;
+        // if (timeValue < duration) {
+        //     float sourceVertices[] = {
+        //         -0.55f,  0.5f, 0.0f,
+        //         0.55f, 0.5f, 0.0f
+        //     };
+        //     float targetVertices[] = {
+        //         0.55f, 0.5f, 0.0f,
+        //         -0.55f,  0.5f, 0.0f
+        //     };
 
-            // To update the first vertex (Index 2 in the original array):
-            glBufferSubData(GL_ARRAY_BUFFER, 6 * sizeof(float), 3 * sizeof(float), &currentVertices[0]);
-            // To update the second vertex (Index 5 in the original array):
-            glBufferSubData(GL_ARRAY_BUFFER, 15 * sizeof(float), 3 * sizeof(float), &currentVertices[3]);
+        //     float currentVertices[6];
+        //     for (int i = 0; i < 6; i++) {
+        //         currentVertices[i] = sourceVertices[i] + t * (targetVertices[i] - sourceVertices[i]);
+        //     }
 
-            // Update the color to transition from red to black
-            glUniform4f(vertexColorLocation, 1 - t, 0.0f, 0.0f, 1.0f);
-        }
+        //     // To update the first vertex (Index 2 in the original array):
+        //     glBufferSubData(GL_ARRAY_BUFFER, 6 * sizeof(float), 3 * sizeof(float), &currentVertices[0]);
+        //     // To update the second vertex (Index 5 in the original array):
+        //     glBufferSubData(GL_ARRAY_BUFFER, 15 * sizeof(float), 3 * sizeof(float), &currentVertices[3]);
+
+        //     // Update the color to transition from red to black
+        //     glUniform4f(vertexColorLocation, 1 - t, 0.0f, 0.0f, 1.0f);
+        // }
         
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         // glDrawArrays(GL_TRIANGLES, 0, 6);
