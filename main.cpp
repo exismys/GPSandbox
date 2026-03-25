@@ -88,9 +88,11 @@ int main() {
         0.5f, 1.0f   // top-center corner
     };
 
-    unsigned int texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
+    // Texture 1
+    unsigned int texture1;
+    glGenTextures(1, &texture1);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture1);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -106,6 +108,31 @@ int main() {
     }
     stbi_image_free(data);
 
+    // Texture 2
+    unsigned int texture2;
+    glGenTextures(1, &texture2);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, texture2);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    int width2, height2, nrChannels2;
+    stbi_set_flip_vertically_on_load(true);
+    unsigned char *data2 = stbi_load("textures/awesomeface.png", &width2, &height2, &nrChannels2, 0);
+    if (data2) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width2, height2, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    } else {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data2);
+    ourShader.use();
+    glUniform1i(glGetUniformLocation(ourShader.ID, "texture1"), 0);
+    ourShader.setInt("texture2", 1);
+
+
     while (!glfwWindowShouldClose(window)) {
         processInput(window);
 
@@ -113,8 +140,12 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         ourShader.use();
-        // int vertexColorLocation = glGetUniformLocation(ourShader.ID, "ourColor");
+        int vertexColorLocation = glGetUniformLocation(ourShader.ID, "ourColor");
         glBindVertexArray(VAO);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture1);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture2);
 
         // FragColor = texture(ourTexture, TexCoord);
 
@@ -122,7 +153,7 @@ int main() {
         // // std::cout << "Time: " << timeValue << std::endl;
         // float duration = 2.0f;
         // float t = fmod(timeValue, duration) / duration;
-        // if (timeValue < duration) {
+        // if (/* timeValue < duration */ true) {
         //     float sourceVertices[] = {
         //         -0.55f,  0.5f, 0.0f,
         //         0.55f, 0.5f, 0.0f
