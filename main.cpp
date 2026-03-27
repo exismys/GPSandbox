@@ -135,11 +135,16 @@ int main() {
     glUniform1i(glGetUniformLocation(ourShader.ID, "texture1"), 0);
     ourShader.setInt("texture2", 1);
 
-    glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
+    // glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
+    // glm::mat4 trans = glm::mat4(1.0f);
+    // trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
+    // vec = trans * vec;
+    // std::cout << vec.x << vec.y << vec.z << std::endl;
+
     glm::mat4 trans = glm::mat4(1.0f);
-    trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
-    vec = trans * vec;
-    std::cout << vec.x << vec.y << vec.z << std::endl;
+    trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+
+    unsigned int transformLoc = glGetUniformLocation(ourShader.ID, "transform");
 
     while (!glfwWindowShouldClose(window)) {
         processInput(window);
@@ -184,7 +189,10 @@ int main() {
         //     // Update the color to transition from red to black
         //     glUniform4f(vertexColorLocation, 1 - t, 0.0f, 0.0f, 1.0f);
         // }
-        
+        glm::mat4 trans = glm::mat4(1.0f);
+        trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0, 0.0, 1.0));
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         // glDrawArrays(GL_TRIANGLES, 0, 6);
 
