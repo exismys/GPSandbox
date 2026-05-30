@@ -1,5 +1,5 @@
 # Specify the minimum CMake version required for this project
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.14)
 
 # Define the project name and set the C++ standard
 project(GPSandbox)
@@ -14,15 +14,32 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(GLFW glfw3)
 pkg_check_modules(GL gl)
 
-# Add the include directory to the search path for headers
-include_directories(include)
+# Fetch third-party header-only libraries
+include(FetchContent)
+
+FetchContent_Declare(glm
+  URL https://github.com/g-truc/glm/releases/download/0.9.9.8/glm-0.9.9.8.zip
+  SOURCE_DIR ${CMAKE_BINARY_DIR}/_deps/glm-src
+)
+
+FetchContent_Declare(stb_image
+  URL https://github.com/nothings/stb/archive/refs/heads/master.zip
+  SOURCE_DIR ${CMAKE_BINARY_DIR}/_deps/stb-src
+)
+
+FetchContent_Declare(khronos_headers
+  URL https://github.com/KhronosGroup/EGL-Registry/archive/refs/heads/main.zip
+  SOURCE_DIR ${CMAKE_BINARY_DIR}/_deps/khronos-src
+)
+
+FetchContent_MakeAvailable(glm stb_image khronos_headers)
 
 # List all source files that need to be compiled into the executable
 set(SOURCES
-    main.cpp
-    glad.c
-    shader.cpp
-    stb_image_impl.cpp
+    src/main.cpp
+    src/glad.c
+    src/shader.cpp
+    src/stb_image_impl.cpp
 )
 
 # Create the executable target named "sim" from the specified source files
@@ -35,8 +52,12 @@ target_link_libraries(sim
     dl
 )
 
-# Include the directories that contain headers for the linked libraries
+# Include the directories that contain headers for the linked libraries and fetched dependencies
 target_include_directories(sim PRIVATE
+    include
     ${GLFW_INCLUDE_DIRS}
     ${GL_INCLUDE_DIRS}
+    ${CMAKE_BINARY_DIR}/_deps/glm-src
+    ${CMAKE_BINARY_DIR}/_deps/stb-src
+    ${CMAKE_BINARY_DIR}/_deps/khronos-src/api/EGL
 )

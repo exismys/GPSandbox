@@ -2,11 +2,20 @@
 
 sudo apt install libglfw3-dev libgl1-mesa-dev
 
+## Build
+
+```bash
+mkdir build && cd build
+cmake ..
+make
+./bin/sim
+```
+
 ## Third-Party Libraries
 
-This project uses the following libraries (included in include dir):
+This project uses the following libraries:
 
-- GLM
-- GLAD
-- stb_image
-- Khronos headers
+- **GLM**
+- **GLAD** 
+- **stb_image**
+- **Khronos headers**
