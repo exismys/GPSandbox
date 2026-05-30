@@ -8,7 +8,8 @@ sudo apt install libglfw3-dev libgl1-mesa-dev
 mkdir build && cd build
 cmake ..
 make
-./bin/sim
+cd ..
+./build/bin/sim
 ```
 
 ## Third-Party Libraries
